@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Místika Oracle — Tu Consulta Espiritual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;500;600&family=EB+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#060410; --ink2:#0f0b20; --ink3:#1a1230;
+  --gold:#c8a84b; --gold2:#e8cc7a; --gold3:#f5e0a0; --gold-dim:#5a4820;
+  --violet:#6d28d9; --violet2:#9b6dff; --violet3:#c4a8ff;
+  --rose:#db2777; --rose2:#ff6db0;
+  --teal:#0d9488; --teal2:#2dd4bf;
+  --txt:#f0eaf8; --txt2:#c8b8e0; --txt3:#8a789a;
+  --bdr:rgba(200,168,75,.18); --bdr2:rgba(200,168,75,.4); --bdr3:rgba(200,168,75,.65);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'EB Garamond',Georgia,serif;background:var(--ink);color:var(--txt);overflow-x:hidden;min-height:100vh;}
+
+/* STARS */
+#stars-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+
+/* ORBS */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);opacity:.12;}
+.orb1{width:600px;height:600px;background:#6d28d9;top:-200px;right:-200px;}
+.orb2{width:400px;height:400px;background:#db2777;bottom:10%;left:-150px;}
+.orb3{width:300px;height:300px;background:#0d9488;top:50%;right:-80px;}
+
+.page{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;}
+
+/* HEADER */
+header{
+  text-align:center;padding:28px 20px 20px;
+  border-bottom:1px solid var(--bdr);
+  background:rgba(6,4,16,.85);backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:50;
+}
+.logo-sym{font-size:26px;display:block;animation:lev 5s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(109,40,217,.7));}
+@keyframes lev{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.logo-name{font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:18px;letter-spacing:4px;display:block;margin-top:4px;}
+.logo-sub{font-style:italic;color:var(--txt3);font-size:11px;letter-spacing:2px;margin-top:2px;}
+.rune-line{color:var(--gold-dim);font-size:12px;letter-spacing:10px;margin-top:6px;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--bdr);background:rgba(6,4,16,.7);}
+.tab{flex:1;padding:10px 6px;text-align:center;cursor:pointer;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;color:var(--txt3);border-right:1px solid var(--bdr);transition:all .25s;position:relative;}
+.tab:last-child{border-right:none;}
+.tab.active{color:var(--gold);background:rgba(200,168,75,.07);}
+.tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.tab-icon{display:block;font-size:16px;margin-bottom:3px;}
+
+/* PANELS */
+.panel{display:none;padding:20px;max-width:700px;margin:0 auto;width:100%;}
+.panel.active{display:block;}
+
+/* FORM ELEMENTS */
+.field-group{margin-bottom:14px;}
+.field-label{font-family:'Cinzel',serif;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:block;}
+.field-note{font-size:12px;color:var(--txt3);font-style:italic;margin-bottom:6px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+select,input[type=text],input[type=date],textarea{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:8px;
+  padding:10px 13px;color:var(--txt);font-family:'EB Garamond',serif;font-size:15px;
+  outline:none;transition:border-color .2s;
+}
+select option{background:#1c1330;color:var(--txt);}
+select:focus,input:focus,textarea:focus{border-color:var(--bdr2);}
+textarea{resize:none;min-height:80px;line-height:1.6;}
+::placeholder{color:var(--txt3);font-style:italic;}
+
+/* SECTION LABEL */
+.sec-lbl{font-family:'Cinzel',serif;color:var(--gold);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.sec-lbl::after{content:'';flex:1;height:1px;background:rgba(200,168,75,.15);}
+
+/* NUMEROLOGY DISPLAY */
+.num-box{background:rgba(109,40,217,.12);border:1px solid rgba(139,92,246,.25);border-radius:10px;padding:14px;margin-bottom:14px;display:none;}
+.num-box.show{display:block;}
+.num-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.num-item{text-align:center;padding:10px 6px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.06);}
+.num-val{font-family:'Cinzel',serif;font-size:24px;color:var(--violet2);}
+.num-key{font-size:11px;color:var(--txt3);margin-top:3px;}
+
+/* PLANET BADGES */
+.planet-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+.planet-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(14,148,136,.12);border:1px solid rgba(14,148,136,.25);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--teal2);}
+
+/* SIGN KARMA */
+.karma-note{font-size:13px;color:var(--txt3);font-style:italic;margin-top:6px;}
+.karma-note span{color:var(--txt2);}
+
+/* MODE GRID */
+.mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+@media(max-width:480px){.mode-grid{grid-template-columns:repeat(2,1fr);}}
+.mode-card{background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .25s;}
+.mode-card:hover,.mode-card.sel{border-color:var(--gold);background:rgba(200,168,75,.09);}
+.mode-card .mc-icon{font-size:24px;display:block;margin-bottom:5px;}
+.mode-card .mc-lbl{font-family:'Cinzel',serif;font-size:9px;color:var(--txt2);letter-spacing:.8px;}
+.mode-card.sel .mc-lbl{color:var(--gold);}
+
+/* COMPAT BOX */
+.compat-box{background:rgba(219,39,119,.08);border:1px solid rgba(219,39,119,.25);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:none;}
+.compat-box.show{display:block;}
+.compat-title{font-family:'Cinzel',serif;font-size:10px;color:var(--rose);letter-spacing:1.5px;margin-bottom:6px;}
+.compat-text{font-size:13px;color:var(--txt2);font-style:italic;margin-bottom:8px;}
+.compat-bar-bg{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
+.compat-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rose),var(--rose2));transition:width 1.2s ease;}
+.compat-score{font-family:'Cinzel',serif;font-size:11px;color:var(--rose2);margin-top:4px;}
+
+/* AMOR EXTRA */
+.amor-extra{display:none;}
+
+/* BTN */
+.btn-oracle{
+  width:100%;background:linear-gradient(135deg,#3c1178,#7c3aed);
+  border:1px solid rgba(155,109,255,.4);border-radius:10px;
+  color:var(--gold2);font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;
+  padding:14px;cursor:pointer;transition:all .3s;margin-top:6px;
+  box-shadow:0 6px 20px rgba(109,40,217,.25);
+}
+.btn-oracle:hover:not(:disabled){background:linear-gradient(135deg,#4c1d95,#8b5cf6);transform:translateY(-1px);box-shadow:0 10px 30px rgba(109,40,217,.4);}
+.btn-oracle:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-secondary{background:transparent;border:1px solid var(--bdr);color:var(--txt2);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.5px;padding:10px 20px;border-radius:8px;cursor:pointer;transition:all .2s;}
+.btn-secondary:hover{border-color:var(--bdr2);color:var(--txt);}
+
+/* LOADING */
+.loading-wrap{padding:40px 20px;text-align:center;display:none;}
+.spin-sym{font-size:40px;animation:spin 3s linear infinite;display:inline-block;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.load-word{color:var(--txt3);font-style:italic;font-size:14px;margin-top:14px;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+/* READING OUTPUT */
+.reading-wrap{display:none;}
+.reading-header{background:rgba(200,168,75,.07);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;margin-bottom:16px;}
+.reading-title{font-family:'Cinzel',serif;color:var(--gold);font-size:14px;letter-spacing:1.5px;}
+.reading-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.meta-pill{background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:20px;padding:3px 11px;font-size:11px;color:var(--txt2);}
+
+/* TAROT CARDS */
+.tarot-row{display:flex;gap:10px;justify-content:center;margin:14px 0;}
+.tarot-card{width:56px;height:78px;background:linear-gradient(135deg,rgba(109,40,217,.25),rgba(6,4,16,.8));border:1px solid rgba(155,109,255,.35);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:26px;animation:cardRev .6s ease forwards;opacity:0;box-shadow:0 4px 15px rgba(0,0,0,.3);}
+@keyframes cardRev{from{opacity:0;transform:rotateY(90deg) scale(.8);}to{opacity:1;transform:rotateY(0) scale(1);}}
+.tarot-card:nth-child(2){animation-delay:.25s;}
+.tarot-card:nth-child(3){animation-delay:.5s;}
+
+/* SECTION NAV */
+.sec-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.sec-btn{background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:20px;padding:5px 13px;font-size:11px;font-family:'Cinzel',serif;letter-spacing:.8px;color:var(--txt2);cursor:pointer;transition:all .2s;}
+.sec-btn.active{background:rgba(200,168,75,.12);border-color:var(--gold);color:var(--gold);}
+
+/* READING SECTION */
+.rsec{display:none;animation:fadeUp .4s ease;}
+.rsec.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.rbody{color:var(--txt);font-size:15px;line-height:2;font-style:italic;background:rgba(255,255,255,.02);border:1px solid var(--bdr);border-radius:10px;padding:16px 18px;}
+.rbody b,.rbody strong{color:var(--gold2);font-style:normal;font-weight:400;}
+.rbody em{color:var(--violet3);}
+
+.divider-rune{text-align:center;color:var(--bdr2);font-size:12px;letter-spacing:10px;margin:16px 0;}
+
+.error-msg{color:#f87171;font-style:italic;font-size:14px;text-align:center;padding:20px;background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.15);border-radius:10px;}
+
+/* HISTORY */
+.history-section{display:none;margin-top:16px;}
+.history-section.show{display:block;}
+.history-item{background:rgba(255,255,255,.02);border:1px solid var(--bdr);border-radius:8px;padding:10px 13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.history-item:hover{border-color:var(--bdr2);}
+.hist-icon{font-size:16px;}
+.hist-q{color:var(--txt3);font-size:13px;font-style:italic;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hist-mode{font-family:'Cinzel',serif;font-size:9px;color:var(--txt3);letter-spacing:1px;flex-shrink:0;}
+
+/* CHAR COUNT */
+.char-count{text-align:right;font-size:11px;color:var(--txt3);margin-top:3px;}
+
+/* CONTINUE BTN WRAP */
+.btn-row{display:flex;gap:8px;margin-top:14px;}
+.btn-row .btn-oracle{flex:1;}
+
+/* FOOTER */
+footer{text-align:center;padding:20px;border-top:1px solid var(--bdr);color:var(--txt3);font-size:11px;letter-spacing:.5px;margin-top:auto;}
+
+/* RESPONSIVE */
+@media(max-width:500px){
+  .grid2{grid-template-columns:1fr;}
+  .num-grid{grid-template-columns:repeat(3,1fr);}
+  .tabs .tab{font-size:8.5px;padding:8px 3px;}
+  .panel{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="page">
+
+<header>
+  <span class="logo-sym">☽</span>
+  <span class="logo-name">MÍSTIKA ORACLE</span>
+  <div class="logo-sub">Astrología · Tarot · Numerología Cabalística</div>
+  <div class="rune-line">✦ ✧ ✦</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" id="tab1" onclick="goTab(1)"><span class="tab-icon">🌙</span>PERFIL</div>
+  <div class="tab" id="tab2" onclick="goTab(2)"><span class="tab-icon">🔮</span>CONSULTA</div>
+  <div class="tab" id="tab3" onclick="goTab(3)"><span class="tab-icon">✨</span>ORÁCULO</div>
+</div>
+
+<!-- PANEL 1 — PERFIL -->
+<div class="panel active" id="panel1">
+  <div class="sec-lbl">Tu perfil espiritual</div>
+
+  <div class="field-group grid2">
+    <div>
+      <label class="field-label">Tu nombre</label>
+      <input type="text" id="myName" placeholder="Nombre completo" maxlength="60" oninput="calcNum()">
+    </div>
+    <div>
+      <label class="field-label">Fecha de nacimiento</label>
+      <input type="date" id="myBirth" onchange="calcNum()">
+    </div>
+  </div>
+
+  <div class="field-group grid2">
+    <div>
+      <label class="field-label">Signo solar ☀️</label>
+      <select id="mySign" onchange="onSignChange()">
+        <option value="">Elige tu signo</option>
+        <option>♈ Aries</option><option>♉ Tauro</option><option>♊ Géminis</option>
+        <option>♋ Cáncer</option><option>♌ Leo</option><option>♍ Virgo</option>
+        <option>♎ Libra</option><option>♏ Escorpio</option><option>♐ Sagitario</option>
+        <option>♑ Capricornio</option><option>♒ Acuario</option><option>♓ Piscis</option>
+      </select>
+    </div>
+    <div>
+      <label class="field-label">Ascendente (opcional)</label>
+      <select id="myRising">
+        <option value="">Ascendente</option>
+        <option>♈ Aries</option><option>♉ Tauro</option><option>♊ Géminis</option>
+        <option>♋ Cáncer</option><option>♌ Leo</option><option>♍ Virgo</option>
+        <option>♎ Libra</option><option>♏ Escorpio</option><option>♐ Sagitario</option>
+        <option>♑ Capricornio</option><option>♒ Acuario</option><option>♓ Piscis</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="planetWrap"></div>
+
+  <div class="num-box" id="numBox">
+    <div class="sec-lbl" style="margin-bottom:12px;">Numerología cabalística</div>
+    <div class="num-grid">
+      <div class="num-item"><div class="num-val" id="nVida">—</div><div class="num-key">Camino de vida</div></div>
+      <div class="num-item"><div class="num-val" id="nAlma">—</div><div class="num-key">Número del alma</div></div>
+      <div class="num-item"><div class="num-val" id="nKarma">—</div><div class="num-key">Karma</div></div>
+    </div>
+  </div>
+
+  <button class="btn-oracle" onclick="goTab(2)">Continuar → Elegir consulta</button>
+</div>
+
+<!-- PANEL 2 — CONSULTA -->
+<div class="panel" id="panel2">
+  <div class="sec-lbl">Tipo de consulta</div>
+  <div class="mode-grid" id="modeGrid">
+    <div class="mode-card sel" data-mode="general" onclick="selMode(this)"><span class="mc-icon">🔮</span><span class="mc-lbl">GENERAL</span></div>
+    <div class="mode-card" data-mode="amor" onclick="selMode(this)"><span class="mc-icon">❤️</span><span class="mc-lbl">AMOR</span></div>
+    <div class="mode-card" data-mode="trabajo" onclick="selMode(this)"><span class="mc-icon">💼</span><span class="mc-lbl">TRABAJO</span></div>
+    <div class="mode-card" data-mode="salud" onclick="selMode(this)"><span class="mc-icon">🌿</span><span class="mc-lbl">SALUD</span></div>
+    <div class="mode-card" data-mode="karma" onclick="selMode(this)"><span class="mc-icon">☯️</span><span class="mc-lbl">KARMA</span></div>
+    <div class="mode-card" data-mode="astros" onclick="selMode(this)"><span class="mc-icon">🪐</span><span class="mc-lbl">ASTROS</span></div>
+    <div class="mode-card" data-mode="meditacion" onclick="selMode(this)"><span class="mc-icon">🧘</span><span class="mc-lbl">MEDITACIÓN</span></div>
+    <div class="mode-card" data-mode="dones" onclick="selMode(this)"><span class="mc-icon">✨</span><span class="mc-lbl">DONES</span></div>
+  </div>
+
+  <div class="amor-extra" id="amorExtra">
+    <div class="sec-lbl">Compatibilidad de pareja</div>
+    <div class="field-group grid2">
+      <div>
+        <label class="field-label">Nombre (opcional)</label>
+        <input type="text" id="partnerName" placeholder="Nombre de esa persona">
+      </div>
+      <div>
+        <label class="field-label">Su signo ❤️</label>
+        <select id="partnerSign" onchange="calcCompat()">
+          <option value="">Signo de la pareja</option>
+          <option>♈ Aries</option><option>♉ Tauro</option><option>♊ Géminis</option>
+          <option>♋ Cáncer</option><option>♌ Leo</option><option>♍ Virgo</option>
+          <option>♎ Libra</option><option>♏ Escorpio</option><option>♐ Sagitario</option>
+          <option>♑ Capricornio</option><option>♒ Acuario</option><option>♓ Piscis</option>
+        </select>
+      </div>
+    </div>
+    <div class="compat-box" id="compatBox">
+      <div class="compat-title">✦ PREVISIÓN DE COMPATIBILIDAD</div>
+      <div class="compat-text" id="compatText"></div>
+      <div class="compat-bar-bg"><div class="compat-bar-fill" id="compatFill" style="width:0%"></div></div>
+      <div class="compat-score" id="compatScore"></div>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">Tu pregunta al universo</label>
+    <textarea id="question" maxlength="500" placeholder="Formula tu pregunta con honestidad y apertura. Cuanto más específica, más precisa será la lectura..."></textarea>
+    <div class="char-count"><span id="charCount">0</span>/500</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-secondary" onclick="goTab(1)">← Volver</button>
+    <button class="btn-oracle" id="oracleBtn" onclick="invokeOracle()">☽ Invocar el Oráculo ☾</button>
+  </div>
+</div>
+
+<!-- PANEL 3 — ORÁCULO -->
+<div class="panel" id="panel3">
+  <div class="loading-wrap" id="loadWrap">
+    <div class="spin-sym">⟳</div>
+    <div class="load-word" id="loadWord">Los planetas están alineándose...</div>
+  </div>
+
+  <div class="reading-wrap" id="readWrap">
+    <div class="reading-header">
+      <div class="reading-title" id="readTitle">Lectura Personalizada</div>
+      <div class="reading-meta" id="readMeta"></div>
+    </div>
+    <div class="tarot-row" id="tarotRow"></div>
+    <div class="sec-nav" id="secNav"></div>
+    <div id="secContent"></div>
+    <div class="divider-rune">· · ✦ · ·</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-secondary" style="flex:1;" onclick="goTab(2)">← Nueva consulta</button>
+      <button class="btn-oracle" style="flex:2;" onclick="resetAll()">✦ Nueva lectura</button>
+    </div>
+    <div class="history-section" id="histSec">
+      <div class="sec-lbl" style="margin-top:16px;">Consultas anteriores</div>
+      <div id="histList"></div>
+    </div>
+  </div>
+
+  <div class="error-msg" id="errMsg" style="display:none;"></div>
+</div>
+
+</div><!-- .page -->
+
+<footer>
+  ☽ Místika Oracle · Consultas ilimitadas · Tu lectura es única e irrepetible ✦
+</footer>
+
+<script>
+(function(){
+
+// ── STARS ──
+const cv=document.getElementById('stars-canvas');
+const ctx=cv.getContext('2d');
+let stars=[];
+function resizeCV(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
+function initStars(){stars=[];for(let i=0;i<160;i++){stars.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.5+.3,a:Math.random(),da:(Math.random()*.006+.002)*(Math.random()<.5?1:-1)});}}
+function drawStars(){ctx.clearRect(0,0,cv.width,cv.height);stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${s.a})`;ctx.fill();});requestAnimationFrame(drawStars);}
+resizeCV();initStars();drawStars();
+window.addEventListener('resize',()=>{resizeCV();initStars();});
+
+// ── DATA ──
+const SIGNS={
+  '♈ Aries':{planet:'Marte ♂',element:'Fuego',mod:'Cardinal',karma:'Aprender la paciencia',don:'Liderazgo y valentía',gem:'Rubí',color:'Rojo',num:1},
+  '♉ Tauro':{planet:'Venus ♀',element:'Tierra',mod:'Fijo',karma:'Soltar el apego material',don:'Estabilidad y sensualidad',gem:'Esmeralda',color:'Verde',num:6},
+  '♊ Géminis':{planet:'Mercurio ☿',element:'Aire',mod:'Mutable',karma:'Profundizar y comprometerse',don:'Comunicación y versatilidad',gem:'Ágata',color:'Amarillo',num:5},
+  '♋ Cáncer':{planet:'Luna ☽',element:'Agua',mod:'Cardinal',karma:'Soltar el pasado',don:'Intuición y cuidado',gem:'Perla',color:'Plateado',num:2},
+  '♌ Leo':{planet:'Sol ☀️',element:'Fuego',mod:'Fijo',karma:'Servir sin ego',don:'Creatividad y generosidad',gem:'Ámbar',color:'Dorado',num:1},
+  '♍ Virgo':{planet:'Mercurio ☿',element:'Tierra',mod:'Mutable',karma:'Aceptar la imperfección',don:'Análisis y servicio',gem:'Zafiro',color:'Azul',num:5},
+  '♎ Libra':{planet:'Venus ♀',element:'Aire',mod:'Cardinal',karma:'Tomar decisiones propias',don:'Armonía y diplomacia',gem:'Ópalo',color:'Rosa',num:6},
+  '♏ Escorpio':{planet:'Plutón ♇',element:'Agua',mod:'Fijo',karma:'Confiar y abrirse',don:'Transformación y profundidad',gem:'Obsidiana',color:'Bordó',num:9},
+  '♐ Sagitario':{planet:'Júpiter ♃',element:'Fuego',mod:'Mutable',karma:'Comprometerse',don:'Filosofía y expansión',gem:'Turquesa',color:'Azul royal',num:3},
+  '♑ Capricornio':{planet:'Saturno ♄',element:'Tierra',mod:'Cardinal',karma:'Equilibrar ambición y descanso',don:'Disciplina y estructura',gem:'Obsidiana negra',color:'Marrón',num:8},
+  '♒ Acuario':{planet:'Urano ♅',element:'Aire',mod:'Fijo',karma:'Amar lo particular',don:'Innovación y humanismo',gem:'Amatista',color:'Violeta',num:4},
+  '♓ Piscis':{planet:'Neptuno ♆',element:'Agua',mod:'Mutable',karma:'Definir límites saludables',don:'Espiritualidad y compasión',gem:'Aguamarina',color:'Azul mar',num:7}
+};
+
+const COMPAT={
+  'Fuego-Fuego':{score:85,txt:'Llamas que se alimentan mutuamente — pasión intensa, energía elevada y complicidad natural.'},
+  'Fuego-Aire':{score:90,txt:'El Aire aviva el Fuego — comunicación fácil, inspiración mutua y química natural entre ustedes.'},
+  'Fuego-Tierra':{score:55,txt:'La Tierra puede sofocar el Fuego — ritmos distintos, pero hay un aprendizaje profundo en esta conexión.'},
+  'Fuego-Agua':{score:62,txt:'Vapor e intensidad — atracción magnética poderosa, pero cuidado con los choques emocionales.'},
+  'Tierra-Tierra':{score:80,txt:'Base sólida y estable — complicidad práctica y crecimiento conjunto sostenido.'},
+  'Tierra-Agua':{score:88,txt:'El Agua nutre la Tierra — relación profunda, intuitiva y con potencial de durabilidad real.'},
+  'Tierra-Aire':{score:50,txt:'Mundos distintos — desafiante en lo cotidiano, pero enriquecedor si hay respeto mutuo.'},
+  'Aire-Aire':{score:78,txt:'Mentes vivas — conversaciones infinitas, libertad compartida y alianza intelectual.'},
+  'Aire-Agua':{score:65,txt:'Sensaciones vs razón — hay belleza en la diferencia, pero la comunicación requiere cuidado constante.'},
+  'Agua-Agua':{score:82,txt:'Océano de emociones — profundidad única, pero atención al exceso de sensibilidad compartida.'}
+};
+
+function getPair(s1,s2){
+  if(!s1||!s2)return null;
+  const e1=SIGNS[s1]?.element,e2=SIGNS[s2]?.element;
+  if(!e1||!e2)return null;
+  const key=[e1,e2].sort().join('-');
+  for(const k in COMPAT){if(k.split('-').sort().join('-')===key)return COMPAT[k];}
+  return null;
+}
+
+const KAB={1:'ℵ',2:'ב',3:'ג',4:'ד',5:'ה',6:'ו',7:'ז',8:'ח',9:'ט',11:'י׳',22:'כ׳',33:'ל׳'};
+
+let currentMode='general';
+let history=[];
+
+// ── TABS ──
+window.goTab=function(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    document.getElementById('tab'+i).classList.toggle('active',i===n);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+
+// ── SIGN CHANGE ──
+window.onSignChange=function(){
+  const s=document.getElementById('mySign').value;
+  const w=document.getElementById('planetWrap');
+  if(s&&SIGNS[s]){
+    const d=SIGNS[s];
+    w.innerHTML=`
+      <div class="planet-row">
+        <span class="planet-badge">🪐 ${d.planet}</span>
+        <span class="planet-badge">🔥 ${d.element}</span>
+        <span class="planet-badge">💎 ${d.gem}</span>
+        <span class="planet-badge">🎨 ${d.color}</span>
+      </div>
+      <div class="karma-note">Karma de esta vida: <span>${d.karma}</span></div>
+    `;
+  } else w.innerHTML='';
+  calcCompat();
+};
+
+// ── NUMEROLOGY ──
+window.calcNum=function(){
+  const dob=document.getElementById('myBirth').value;
+  const name=document.getElementById('myName').value;
+  if(!dob){document.getElementById('numBox').classList.remove('show');return;}
+  const parts=dob.split('-');
+  if(parts.length<3)return;
+  const digits=dob.replace(/-/g,'').split('').map(Number);
+  let sum=digits.reduce((a,b)=>a+b,0);
+  while(sum>9&&sum!==11&&sum!==22&&sum!==33)sum=String(sum).split('').map(Number).reduce((a,b)=>a+b,0);
+  let karma=parseInt(parts[2])%9||9;
+  while(karma>9&&karma!==11&&karma!==22)karma=String(karma).split('').map(Number).reduce((a,b)=>a+b,0);
+  let alma=0;
+  const vowels='aeiouáéíóúâêîôûãõàèìòùäëïöü';
+  for(const c of name.toLowerCase()){if(vowels.includes(c))alma+=c.charCodeAt(0)%9||9;}
+  while(alma>9&&alma!==11&&alma!==22)alma=String(alma).split('').map(Number).reduce((a,b)=>a+b,0);
+  if(!alma)alma=sum;
+  document.getElementById('nVida').textContent=(KAB[sum]||'')+' '+sum;
+  document.getElementById('nAlma').textContent=(KAB[alma]||'')+' '+alma;
+  document.getElementById('nKarma').textContent=(KAB[karma]||'')+' '+karma;
+  document.getElementById('numBox').classList.add('show');
+};
+
+// ── MODE SELECT ──
+window.selMode=function(el){
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  currentMode=el.dataset.mode;
+  document.getElementById('amorExtra').style.display=currentMode==='amor'?'block':'none';
+};
+
+// ── COMPAT ──
+window.calcCompat=function(){
+  const s1=document.getElementById('mySign').value;
+  const s2=document.getElementById('partnerSign').value;
+  const box=document.getElementById('compatBox');
+  if(!s1||!s2){box.classList.remove('show');return;}
+  const pair=getPair(s1,s2);
+  if(!pair){box.classList.remove('show');return;}
+  document.getElementById('compatText').textContent=pair.txt;
+  document.getElementById('compatScore').textContent=`Sintonía energética: ${pair.score}%`;
+  box.classList.add('show');
+  setTimeout(()=>{document.getElementById('compatFill').style.width=pair.score+'%';},100);
+};
+
+// ── CHAR COUNT ──
+document.getElementById('question').addEventListener('input',function(){
+  document.getElementById('charCount').textContent=this.value.length;
+});
+
+// ── LOADING MESSAGES ──
+const loadMsgs=[
+  'Los planetas están alineándose...',
+  'Las cartas revelan sus secretos...',
+  'Plutón mapea tus patrones ocultos...',
+  'La Luna te susurra su mensaje...',
+  'Los arcanos develan tu destino...',
+  'La numerología cabalística despierta...',
+  'Tu karma toma forma en las cartas...'
+];
+
+const modeLabels={
+  general:'Lectura General',amor:'Amor y Relaciones',trabajo:'Trabajo y Prosperidad',
+  salud:'Salud y Bienestar',karma:'Karma y Misión de Vida',
+  astros:'Mapa Astral y Planetas',meditacion:'Meditación y Prácticas',dones:'Dones y Talentos del Alma'
+};
+
+const secLabels={CARTAS:'Las Cartas',ASTROS:'Mapa Astral',ESENCIA:'Revelación',KARMA:'Karma',DONES:'Tus Dones',PRACTICAS:'Prácticas',MENSAJE:'Mensaje del Universo'};
+const secIcons={CARTAS:'🃏',ASTROS:'🪐',ESENCIA:'🔮',KARMA:'☯️',DONES:'✨',PRACTICAS:'🧘',MENSAJE:'💫'};
+const CARD_EM=['🌙','⭐','☀️','🔮','🌊','🔥','💫','🌺','⚡','🌈','🃏','✨','🌟','🎴','🪄'];
+
+// ── ORACLE ──
+window.invokeOracle=async function(){
+  const name=document.getElementById('myName').value.trim()||'Consultante';
+  const sign=document.getElementById('mySign').value||'';
+  const rising=document.getElementById('myRising').value||'';
+  const dob=document.getElementById('myBirth').value||'';
+  const question=document.getElementById('question').value.trim();
+  const partnerSign=document.getElementById('partnerSign').value||'';
+  const partnerName=document.getElementById('partnerName').value.trim()||'';
+
+  if(!question){alert('Por favor, formula tu pregunta para el oráculo.');return;}
+
+  goTab(3);
+  document.getElementById('loadWrap').style.display='block';
+  document.getElementById('readWrap').style.display='none';
+  document.getElementById('errMsg').style.display='none';
+
+  let mi=0;
+  const lw=document.getElementById('loadWord');
+  const intv=setInterval(()=>{mi=(mi+1)%loadMsgs.length;lw.textContent=loadMsgs[mi];},2000);
+
+  const sd=SIGNS[sign]||{};
+  const nV=document.getElementById('nVida').textContent||'no calculado';
+  const nA=document.getElementById('nAlma').textContent||'no calculado';
+  const nK=document.getElementById('nKarma').textContent||'no calculado';
+  const compatInfo=partnerSign&&sign?`Compatibilidad con ${partnerSign}: ${getPair(sign,partnerSign)?.txt||''} Score: ${getPair(sign,partnerSign)?.score||'?'}%`:'';
+
+  const sys=`Eres MÍSTIKA, la más sabia y precisa cartomante, astróloga y guía espiritual de la era digital. Combinas tarot (Rider-Waite y Thoth), astrología occidental y karmica, numerología cabalística (árbol de la vida, sephiroth, letras hebreas), planetas regentes y karma del alma.
+
+REGLAS ABSOLUTAS:
+1. SIEMPRE usa el nombre "${name}" de forma íntima — ella/él debe sentir que hablas solo para su alma
+2. Menciona SIEMPRE el signo (${sign||'no indicado'}), planeta (${sd.planet||''}), elemento (${sd.element||''})
+3. Si hay ascendente (${rising||'no indicado'}), intégralo con profundidad
+4. Usa los números cabalísticos: Camino ${nV}, Alma ${nA}, Karma ${nK}
+5. Saca EXACTAMENTE 3 cartas de tarot reales del mazo Rider-Waite y nómbralas
+6. Cada lectura debe sentirse ÚNICA e irrepetible — jamás genérica
+7. Tono: poético, misterioso, empático, íntimo, nunca aterrador, siempre con esperanza y luz
+8. Responde SIEMPRE en español
+9. Para KARMA: lecciones específicas, patrones kármicos, árbol de la vida
+10. Para ASTROS: planeta regente, tránsitos actuales, dones y desafíos planetarios
+11. Para MEDITACIÓN: prácticas específicas para este signo con detalles concretos
+12. Para DONES: talentos espirituales únicos del signo + numerología
+13. Para AMOR con pareja (${partnerSign||'no indicado'}, ${partnerName||''}): dinámica energética, karma de la conexión, desafíos y dones
+
+FORMATO EXACTO (usa estos encabezados):
+§ CARTAS: [Las 3 cartas exactas del tarot e interpretación]
+§ ASTROS: [Análisis planetario y astral personalizado]
+§ ESENCIA: [Revelación principal de la consulta]
+§ KARMA: [Lecciones kármicas con numerología cabalística]
+§ DONES: [Dones espirituales y talentos del alma]
+§ PRACTICAS: [Meditaciones y rituales específicos]
+§ MENSAJE: [Mensaje final del universo — inspirador y único]`;
+
+  const usr=`Nombre: ${name}
+Signo Solar: ${sign||'no indicado'}
+Ascendente: ${rising||'no indicado'}
+Fecha de nacimiento: ${dob||'no indicada'}
+Planeta regente: ${sd.planet||''}
+Elemento: ${sd.element||''}
+Karma del signo: ${sd.karma||''}
+Piedra: ${sd.gem||''}
+Modalidad: ${sd.mod||''}
+Numerología Cabalística:
+  - Camino de vida: ${nV}
+  - Número del alma: ${nA}
+  - Karma: ${nK}
+Tipo de consulta: ${modeLabels[currentMode]}
+${partnerSign?`Signo de la pareja: ${partnerSign}\nNombre de la pareja: ${partnerName}\n${compatInfo}`:''}
+Pregunta: ${question}`;
+
+  try{
+    const res=await fetch('/.netlify/functions/oracle',{
+      method:'POST',
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:sys,
+        messages:[{role:'user',content:usr}]
+      })
+    });
+    clearInterval(intv);
+    const data=await res.json();
+    if(!res.ok||!data.content)throw new Error(data.error?.message||'Error de conexión');
+    const raw=data.content.map(b=>b.text||'').join('');
+    renderReading(raw,name,sign,partnerSign);
+  }catch(e){
+    clearInterval(intv);
+    document.getElementById('loadWrap').style.display='none';
+    document.getElementById('errMsg').style.display='block';
+    document.getElementById('errMsg').innerHTML=`✦ El velo entre los mundos se cerró momentáneamente.<br>Por favor, inténtalo de nuevo.<br><small style="font-size:11px;color:#6b7280;margin-top:6px;display:block;">${e.message}</small>`;
+  }
+};
+
+function renderReading(raw,name,sign,partnerSign){
+  document.getElementById('loadWrap').style.display='none';
+  document.getElementById('readWrap').style.display='block';
+
+  const ml=modeLabels[currentMode]||'Lectura';
+  document.getElementById('readTitle').textContent=`${ml} · ${name}${sign?' · '+sign:''}`;
+
+  const meta=document.getElementById('readMeta');meta.innerHTML='';
+  const now=new Date();
+  [now.toLocaleDateString('es-CO'),sign||'',SIGNS[sign]?.planet||'',partnerSign?`❤️ ${partnerSign}`:''].filter(Boolean).forEach(p=>{
+    const el=document.createElement('span');el.className='meta-pill';el.textContent=p;meta.appendChild(el);
+  });
+
+  const tarotRow=document.getElementById('tarotRow');tarotRow.innerHTML='';
+  for(let i=0;i<3;i++){const c=document.createElement('div');c.className='tarot-card';c.textContent=CARD_EM[Math.floor(Math.random()*CARD_EM.length)];tarotRow.appendChild(c);}
+
+  const sections=['CARTAS','ASTROS','ESENCIA','KARMA','DONES','PRACTICAS','MENSAJE'];
+  const parsed={};
+  sections.forEach(sec=>{
+    const rx=new RegExp(`§\\s*${sec}:[\\s\\S]*?(?=§\\s*[A-Z]+:|$)`,'i');
+    const m=raw.match(rx);
+    if(m){
+      let c=m[0].replace(new RegExp(`§\\s*${sec}:`,'i'),'').trim();
+      c=c.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>');
+      parsed[sec]=c;
+    }
+  });
+
+  const nav=document.getElementById('secNav');const cont=document.getElementById('secContent');
+  nav.innerHTML='';cont.innerHTML='';
+  const avail=sections.filter(s=>parsed[s]);
+
+  if(!avail.length){
+    cont.innerHTML=`<div class="rbody">${raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>')}</div>`;
+  } else {
+    avail.forEach((sec,i)=>{
+      const btn=document.createElement('button');
+      btn.className='sec-btn'+(i===0?' active':'');
+      btn.textContent=`${secIcons[sec]} ${secLabels[sec]}`;
+      btn.onclick=()=>{
+        document.querySelectorAll('.sec-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.rsec').forEach(d=>d.classList.remove('active'));
+        document.getElementById('rsec-'+sec).classList.add('active');
+      };
+      nav.appendChild(btn);
+      const div=document.createElement('div');
+      div.className='rsec'+(i===0?' active':'');
+      div.id='rsec-'+sec;
+      div.innerHTML=`<div class="rbody">${parsed[sec]}</div>`;
+      cont.appendChild(div);
+    });
+  }
+
+  // history
+  history.unshift({q:document.getElementById('question').value.substring(0,55)+'...',mode:currentMode,icon:document.querySelector('.mode-card.sel .mc-icon')?.textContent||'🔮'});
+  if(history.length>5)history.pop();
+  renderHistory();
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderHistory(){
+  const sec=document.getElementById('histSec');
+  const list=document.getElementById('histList');
+  if(history.length<=1){sec.classList.remove('show');return;}
+  sec.classList.add('show');
+  list.innerHTML=history.slice(1).map((h,i)=>`
+    <div class="history-item" onclick="loadHistory(${i+1})">
+      <span class="hist-icon">${h.icon}</span>
+      <span class="hist-q">${h.q}</span>
+      <span class="hist-mode">${modeLabels[h.mode]||h.mode}</span>
+    </div>
+  `).join('');
+}
+
+window.loadHistory=function(i){
+  if(history[i]){
+    document.getElementById('question').value=history[i].q.replace('...','');
+    goTab(2);
+  }
+};
+
+window.resetAll=function(){
+  document.getElementById('question').value='';
+  document.getElementById('charCount').textContent='0';
+  goTab(2);
+};
+
+})();
+</script>
+</body>
+</html>
