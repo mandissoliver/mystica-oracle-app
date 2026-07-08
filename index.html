@@ -335,6 +335,16 @@ footer{text-align:center;padding:20px;border-top:1px solid var(--bdr);color:var(
     <div class="sec-nav" id="secNav"></div>
     <div id="secContent"></div>
     <div class="divider-rune">· · ✦ · ·</div>
+
+    <div style="background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.3);border-radius:12px;padding:18px;margin-bottom:14px;text-align:center;">
+      <div style="font-family:'Cinzel',serif;color:#c8a84b;font-size:11px;letter-spacing:2px;margin-bottom:8px;">✦ ACCESO ILIMITADO AL ORÁCULO</div>
+      <div style="font-size:14px;color:#c8b8e0;font-style:italic;margin-bottom:14px;line-height:1.6;">Consultas ilimitadas de amor, karma, astros, trabajo y más.<br>Tu lectura completa y personalizada, siempre que la necesites.</div>
+      <a href="https://pay.hotmart.com/X106125544H" target="_blank" style="display:block;background:linear-gradient(135deg,#3c1178,#7c3aed);border:1px solid rgba(155,109,255,.5);border-radius:10px;padding:14px;color:#e8cc7a;font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;text-decoration:none;margin-bottom:8px;">
+        🔮 SUSCRIBIRME POR USD $4.99/MES
+      </a>
+      <div style="font-size:11px;color:#8a789a;">Sin contratos · Cancela cuando quieras · Acceso inmediato</div>
+    </div>
+
     <div style="display:flex;gap:8px;">
       <button class="btn-secondary" style="flex:1;" onclick="goTab(2)">← Nueva consulta</button>
       <button class="btn-oracle" style="flex:2;" onclick="resetAll()">✦ Nueva lectura</button>
@@ -536,31 +546,26 @@ window.invokeOracle=async function(){
   const nK=document.getElementById('nKarma').textContent||'no calculado';
   const compatInfo=partnerSign&&sign?`Compatibilidad con ${partnerSign}: ${getPair(sign,partnerSign)?.txt||''} Score: ${getPair(sign,partnerSign)?.score||'?'}%`:'';
 
-  const sys=`Eres MÍSTIKA, la más sabia y precisa cartomante, astróloga y guía espiritual de la era digital. Combinas tarot (Rider-Waite y Thoth), astrología occidental y karmica, numerología cabalística (árbol de la vida, sephiroth, letras hebreas), planetas regentes y karma del alma.
+  const sys=`Eres MÍSTIKA, cartomante y astróloga espiritual. Combinas tarot Rider-Waite, astrología karmica y numerología cabalística.
 
-REGLAS ABSOLUTAS:
-1. SIEMPRE usa el nombre "${name}" de forma íntima — ella/él debe sentir que hablas solo para su alma
-2. Menciona SIEMPRE el signo (${sign||'no indicado'}), planeta (${sd.planet||''}), elemento (${sd.element||''})
-3. Si hay ascendente (${rising||'no indicado'}), intégralo con profundidad
-4. Usa los números cabalísticos: Camino ${nV}, Alma ${nA}, Karma ${nK}
-5. Saca EXACTAMENTE 3 cartas de tarot reales del mazo Rider-Waite y nómbralas
-6. Cada lectura debe sentirse ÚNICA e irrepetible — jamás genérica
-7. Tono: poético, misterioso, empático, íntimo, nunca aterrador, siempre con esperanza y luz
-8. Responde SIEMPRE en español
-9. Para KARMA: lecciones específicas, patrones kármicos, árbol de la vida
-10. Para ASTROS: planeta regente, tránsitos actuales, dones y desafíos planetarios
-11. Para MEDITACIÓN: prácticas específicas para este signo con detalles concretos
-12. Para DONES: talentos espirituales únicos del signo + numerología
-13. Para AMOR con pareja (${partnerSign||'no indicado'}, ${partnerName||''}): dinámica energética, karma de la conexión, desafíos y dones
+REGLAS:
+- Usa siempre el nombre "${name}" de forma íntima
+- Signo: ${sign||'no indicado'}, Planeta: ${sd.planet||''}, Elemento: ${sd.element||''}
+- Ascendente: ${rising||'no indicado'}
+- Números cabalísticos: Camino ${nV}, Alma ${nA}, Karma ${nK}
+- Nombra exactamente 3 cartas reales del Rider-Waite
+- Tono: poético, misterioso, empático, esperanzador
+- Responde SIEMPRE en español
+- Cada sección: máximo 60 palabras — conciso y poderoso
 
-FORMATO EXACTO (usa estos encabezados):
-§ CARTAS: [Las 3 cartas exactas del tarot e interpretación]
-§ ASTROS: [Análisis planetario y astral personalizado]
-§ ESENCIA: [Revelación principal de la consulta]
-§ KARMA: [Lecciones kármicas con numerología cabalística]
-§ DONES: [Dones espirituales y talentos del alma]
-§ PRACTICAS: [Meditaciones y rituales específicos]
-§ MENSAJE: [Mensaje final del universo — inspirador y único]`;
+FORMATO OBLIGATORIO — usa EXACTAMENTE estos encabezados con § :
+§ CARTAS: [3 cartas + interpretación breve]
+§ ASTROS: [análisis planetario personal]
+§ ESENCIA: [revelación principal]
+§ KARMA: [lección karmica + numerología]
+§ DONES: [talentos del alma]
+§ PRACTICAS: [ritual o meditación específica]
+§ MENSAJE: [mensaje final inspirador]`;
 
   const usr=`Nombre: ${name}
 Signo Solar: ${sign||'no indicado'}
@@ -580,12 +585,12 @@ ${partnerSign?`Signo de la pareja: ${partnerSign}\nNombre de la pareja: ${partne
 Pregunta: ${question}`;
 
   try{
-    const res=await fetch('/.netlify/functions/oracle',{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{"Content-Type":"application/json"},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
+        model:'claude-sonnet-4-5',
+        max_tokens:1500,
         system:sys,
         messages:[{role:'user',content:usr}]
       })
