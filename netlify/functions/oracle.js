@@ -1,6 +1,22 @@
 const https = require('https');
 
 exports.handler = async function(event, context) {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -8,17 +24,13 @@ exports.handler = async function(event, context) {
     'Content-Type': 'application/json'
   };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  
+
   if (!apiKey) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'API key not found in environment' })
+      body: JSON.stringify({ error: 'API key not configured' })
     };
   }
 
@@ -26,7 +38,7 @@ exports.handler = async function(event, context) {
     const body = JSON.parse(event.body);
     const payload = JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 1000,
+      max_tokens: 1500,
       system: body.system,
       messages: body.messages
     });
@@ -48,8 +60,11 @@ exports.handler = async function(event, context) {
         let responseData = '';
         res.on('data', (chunk) => { responseData += chunk; });
         res.on('end', () => {
-          try { resolve({ status: res.statusCode, body: JSON.parse(responseData) }); }
-          catch(e) { reject(new Error('Parse error: ' + responseData)); }
+          try {
+            resolve({ status: res.statusCode, body: JSON.parse(responseData) });
+          } catch(e) {
+            reject(new Error('Parse error: ' + responseData));
+          }
         });
       });
 
