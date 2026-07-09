@@ -574,18 +574,19 @@ Pregunta: ${question}`;
     const res=await fetch('/.netlify/functions/oracle',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({system:sys,messages:[{role:'user',content:usr}]})
+      body:JSON.stringify({
+        free: true,
+        system:sys,
+        messages:[{role:'user',content:usr}]
+      })
     });
     clearInterval(intv);
     const data=await res.json();
     if(!res.ok||!data.content)throw new Error(data.error?.message||'Error de conexión');
-    const raw=data.content.map(b=>b.text||'').join('');
-
-    // Increment free counter
+    const parsed = JSON.parse(data.content[0].text);
     incFreeCount();
     updateBadge();
-
-    renderReading(raw,name,sign,partnerSign);
+    renderReadingParsed(parsed,name,sign,partnerSign);
   }catch(e){
     clearInterval(intv);
     document.getElementById('loadWrap').style.display='none';
@@ -594,7 +595,7 @@ Pregunta: ${question}`;
   }
 };
 
-function renderReading(raw,name,sign,partnerSign){
+function renderReadingParsed(parsed,name,sign,partnerSign){
   document.getElementById('loadWrap').style.display='none';
   document.getElementById('readWrap').style.display='block';
 
@@ -612,78 +613,58 @@ function renderReading(raw,name,sign,partnerSign){
   const tarotRow=document.getElementById('tarotRow');
   tarotRow.innerHTML='';
   drawn.forEach(card=>{
-    const c=document.createElement('div');
-    c.className='tarot-card';
-    c.title=card.name;
+    const c=document.createElement('div');c.className='tarot-card';c.title=card.name;
     c.innerHTML=`<span class="tarot-card-icon">${card.icon}</span><span class="tarot-card-name">${card.name}</span><span class="tarot-corner">${card.num}</span>`;
     tarotRow.appendChild(c);
   });
 
-  const sections=['CARTAS','ASTROS','ESENCIA','KARMA','DONES','PRACTICAS','MENSAJE'];
-  const parsed={};
-  sections.forEach(sec=>{
-    const rx=new RegExp(`§\\s*${sec}:[\\s\\S]*?(?=§\\s*[A-Z]+:|$)`,'i');
-    const m=raw.match(rx);
-    if(m){
-      let c=m[0].replace(new RegExp(`§\\s*${sec}:`,'i'),'').trim();
-      c=c.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>');
-      parsed[sec]=c;
-    }
-  });
-
+  const sections=parsed.sections||{};
   const nav=document.getElementById('secNav');
   const cont=document.getElementById('secContent');
   const paywallSec=document.getElementById('paywallSection');
   nav.innerHTML='';cont.innerHTML='';paywallSec.innerHTML='';
 
-  const avail=sections.filter(s=>parsed[s]);
-  const freeAvail=avail.filter(s=>FREE_SECTIONS.includes(s));
-  const lockedAvail=avail.filter(s=>LOCKED_SECTIONS.includes(s));
+  const freeSecs=['CARTAS','ESENCIA'];
+  const secLabelsMap={CARTAS:'Las Cartas',ASTROS:'Mapa Astral',ESENCIA:'Revelación',KARMA:'Karma',DONES:'Tus Dones',PRACTICAS:'Prácticas',MENSAJE:'Mensaje del Universo'};
+  const secIconsMap={CARTAS:'🃏',ASTROS:'🪐',ESENCIA:'🔮',KARMA:'☯️',DONES:'✨',PRACTICAS:'🧘',MENSAJE:'💫'};
 
-  if(!avail.length){
-    cont.innerHTML=`<div class="rbody">${raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
-  } else {
-    // Show free sections
-    freeAvail.forEach((sec,i)=>{
-      const btn=document.createElement('button');
-      btn.className='sec-btn'+(i===0?' active':'');
-      btn.textContent=`${secIcons[sec]} ${secLabels[sec]}`;
-      btn.onclick=()=>{
-        document.querySelectorAll('.sec-btn').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.rsec').forEach(d=>d.classList.remove('active'));
-        document.getElementById('rsec-'+sec).classList.add('active');
-      };
-      nav.appendChild(btn);
-      const div=document.createElement('div');
-      div.className='rsec'+(i===0?' active':'');
-      div.id='rsec-'+sec;
-      div.innerHTML=`<div class="rbody">${parsed[sec]}</div>`;
-      cont.appendChild(div);
-    });
+  freeSecs.forEach((sec,i)=>{
+    if(!sections[sec])return;
+    const btn=document.createElement('button');
+    btn.className='sec-btn'+(i===0?' active':'');
+    btn.textContent=`${secIconsMap[sec]} ${secLabelsMap[sec]}`;
+    btn.onclick=()=>{
+      document.querySelectorAll('.sec-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.rsec').forEach(d=>d.classList.remove('active'));
+      document.getElementById('rsec-'+sec).classList.add('active');
+    };
+    nav.appendChild(btn);
+    const div=document.createElement('div');
+    div.className='rsec'+(i===0?' active':'');
+    div.id='rsec-'+sec;
+    div.innerHTML=`<div class="rbody">${sections[sec].replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>')}</div>`;
+    cont.appendChild(div);
+  });
 
-    // Locked sections preview + paywall
-    const lockedPreview=lockedAvail.length>0?lockedAvail.map(s=>`<strong>${secLabels[s]}:</strong> ${(parsed[s]||'').substring(0,60)}...`).join('<br>'):
-      '🪐 Mapa Astral · ☯️ Karma · ✨ Dones del Alma · 🧘 Prácticas · 💫 Mensaje del Universo';
-
-    paywallSec.innerHTML=`
-      <div class="paywall-block">
-        <div class="paywall-blur">${lockedPreview}</div>
-        <span class="paywall-icon">🔮</span>
-        <div class="paywall-title">TU LECTURA COMPLETA TE ESPERA</div>
-        <div class="paywall-sub">Desbloquea tu <strong>Mapa Astral</strong>, <strong>Karma</strong>, <strong>Dones del Alma</strong>, <strong>Prácticas espirituales</strong> y el <strong>Mensaje final del Universo</strong> — todo personalizado para ti.</div>
-        <div class="paywall-features">
-          <span class="paywall-feat">🪐 Mapa Astral</span>
-          <span class="paywall-feat">☯️ Karma</span>
-          <span class="paywall-feat">✨ Tus Dones</span>
-          <span class="paywall-feat">🧘 Prácticas</span>
-          <span class="paywall-feat">💫 Mensaje del Universo</span>
-          <span class="paywall-feat">♾️ Consultas ilimitadas</span>
-        </div>
-        <a href="https://pay.hotmart.com/X106125544H" target="_blank" class="btn-pay">🔮 DESBLOQUEAR LECTURA COMPLETA — USD $4.99/MES</a>
-        <div class="paywall-guarantee">🔒 Sin contratos · Cancela cuando quieras · Acceso inmediato</div>
-      </div>`;
-  }
+  // Paywall block
+  paywallSec.innerHTML=`
+    <div class="paywall-block">
+      <div class="paywall-blur">🪐 Tu planeta regente revela algo crucial... ☯️ Tu karma de esta vida está activado ahora mismo... ✨ Tienes dones que aún no has descubierto... 🧘 Una práctica espiritual específica para este momento... 💫 El universo tiene un mensaje final sólo para ti...</div>
+      <span class="paywall-icon">🔮</span>
+      <div class="paywall-title">TU LECTURA COMPLETA TE ESPERA</div>
+      <div class="paywall-sub">Desbloquea tu <strong>Mapa Astral</strong>, <strong>Karma</strong>, <strong>Dones del Alma</strong>, <strong>Prácticas espirituales</strong> y el <strong>Mensaje final del Universo</strong>.</div>
+      <div class="paywall-features">
+        <span class="paywall-feat">🪐 Mapa Astral</span>
+        <span class="paywall-feat">☯️ Karma</span>
+        <span class="paywall-feat">✨ Tus Dones</span>
+        <span class="paywall-feat">🧘 Prácticas</span>
+        <span class="paywall-feat">💫 Mensaje</span>
+        <span class="paywall-feat">♾️ Ilimitado</span>
+      </div>
+      <a href="https://pay.hotmart.com/X106125544H" target="_blank" class="btn-pay">🔮 DESBLOQUEAR LECTURA COMPLETA — USD $4.99/MES</a>
+      <div class="paywall-guarantee">🔒 Sin contratos · Cancela cuando quieras · Acceso inmediato</div>
+    </div>`;
 }
 
 window.resetAll=function(){
