@@ -35,11 +35,15 @@ FORMATO ESTRICTO — usa EXACTAMENTE estos separadores, uno por línea:
 [PRACTICAS] texto aquí
 [MENSAJE] texto aquí
 
-Cada sección máximo 60 palabras. USA los corchetes exactamente así.`;
+INSTRUCCIONES DE LONGITUD:
+- [CARTAS]: 120-150 palabras. Nombra las 3 cartas con su significado profundo y cómo se relacionan con la situación específica de la persona. Sé dramático y revelador.
+- [ESENCIA]: 120-150 palabras. Esta es la revelación principal — sé profundo, poético y termina con una frase que deje a la persona con ganas de saber más. Corta en el momento más tenso e instigante, como si el universo estuviera a punto de revelar algo crucial.
+- [ASTROS], [KARMA], [DONES], [PRACTICAS], [MENSAJE]: 60-80 palabras cada uno.
+USA los corchetes exactamente así.`;
 
     const payload = JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1200,
+      max_tokens: 1600,
       system: systemPrompt,
       messages: body.messages
     });
