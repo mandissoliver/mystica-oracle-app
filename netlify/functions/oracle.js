@@ -4,7 +4,15 @@ exports.handler = async function(event, context) {
   context.callbackWaitsForEmptyEventLoop = false;
 
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Methods': 'POST, OPTIONS' }, body: '' };
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
   }
 
   if (event.httpMethod !== 'POST') {
@@ -23,10 +31,13 @@ exports.handler = async function(event, context) {
 
   try {
     const body = JSON.parse(event.body);
+
+    const strictSystem = body.system + `\n\nINSTRUCCIÓN CRÍTICA: Usa EXACTAMENTE este formato:\n§ CARTAS: [texto]\n§ ASTROS: [texto]\n§ ESENCIA: [texto]\n§ KARMA: [texto]\n§ DONES: [texto]\n§ PRACTICAS: [texto]\n§ MENSAJE: [texto]\nCada sección: máximo 60 palabras.`;
+
     const payload = JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1000,
-      system: body.system,
+      max_tokens: 1200,
+      system: strictSystem,
       messages: body.messages
     });
 
